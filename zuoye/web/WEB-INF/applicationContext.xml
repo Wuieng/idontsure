@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <context:component-scan base-package="cdsd" >
+        <!--配置哪些注解不扫描 不处理controller-->
+        <!--如果这里我只改变目录结构，比如将dao和service包专门放在一起，或许也行，用于扫面service和dao这里不扫描controller注解        -->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+<!--    删除下方的文件后依然成功运行了，说明貌似问题就出自于下文-->
+    <!--Spring整合MyBatis框架-->
+    <!--配置连接池-->
+<!--    添加c3p0后不再报错了-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+<!-- 貌似报错无法使用com.mysql.jdbc.Driver转换为com.mysql.cj.jdbc.Driver详情见https://blog.csdn.net/qq_23994787/article/details/90400163 -->
+    <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/noda?serverTimezone=GMT%2B8"/>
+    <property name="user" value="root"/>
+    <property name="password" value="1234"/>
+</bean>
+
+    <!--配置SqlSessionFactory工厂-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!--配置AccountDao接口所在包-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cdsd.dao"/>
+    </bean>
+
+
+</beans>
